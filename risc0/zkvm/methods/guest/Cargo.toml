@@ -19,6 +19,11 @@ risc0-zkvm = { path = "../..", default-features = false }
 risc0-zkvm-methods = { path = "..", default-features = false }
 risc0-zkvm-platform = { path = "../../platform" }
 serde = { version = "1.0", default-features = false, features = ["derive"] }
+# TOOD(Matthias): Not sure the path is right?
+simple-c-pkg = { path = "../test-resources/simple-c-pkg", optional = true}
+
+
+
 
 [profile.release]
 lto = true
@@ -31,3 +36,6 @@ debug = 1
 
 [package.metadata.release]
 release = false
+
+[features]
+risc_cc = ["simple-c-pkg"]

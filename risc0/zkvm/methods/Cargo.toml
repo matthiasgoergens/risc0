@@ -16,3 +16,6 @@ methods = ["guest", "std"]
 [dependencies]
 risc0-zeroio = { workspace = true }
 serde = { version = "1.0", default-features = false, features = ["derive"] }
+
+[features]
+risc_cc = []

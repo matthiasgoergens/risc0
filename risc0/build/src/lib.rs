@@ -38,6 +38,43 @@ use zip::ZipArchive;
 const LINKER_SCRIPT: &str = include_str!("../risc0.ld");
 const TARGET_JSON: &str = include_str!("../riscv32im-risc0-zkvm-elf.json");
 
+/// A wrapper for the `cc` crate that compiles to `riscv32im` with no
+/// boilerplate and reasonable defaults.
+///
+/// ```no_run
+/// fn main() {
+///     risc0_zkvm::build::rcc::Build::new()
+///         .file("src/foo.c")
+///         .compile("foo");
+/// }
+/// ```
+///
+/// is equivalent to...
+///
+/// ```no_run
+/// fn main() {
+///     cc::Build::new() // The normal `cc` crate
+///         .target("riscv32im-unknown-none-elf")
+///         .no_default_flags(true)
+///         .flag("-O3")
+///         .flag("--target=riscv32-unknown-none-elf")
+///         .flag("-mabi=ilp32")
+///         .flag("-mcmodel=medany")
+///         .flag("-fdata-sections")
+///         .flag("-ffunction-sections")
+///         .flag("-dead_strip")
+///         .flag("-flto")
+///         .flag("-march=rv32im")
+///         .file("src/foo.c")
+///         .flag("-static")
+///         .flag("--sysroot=/opt/riscv/riscv32-unknown-elf")
+///         .flag("--gcc-toolchain=/opt/riscv")
+///         .compile("foo");
+/// }
+/// ```
+#[cfg(feature = "risc_cc")]
+pub mod rcc;
+
 #[derive(Debug, Deserialize)]
 struct Risc0Metadata {
     methods: Vec<String>,
@@ -183,7 +220,7 @@ fn guest_packages(pkg: &Package) -> Vec<Package> {
 }
 
 /// Returns all methods associated with the given riscv guest package.
-fn guest_methods<P>(pkg: &Package, out_dir: P) -> Vec<Risc0Method>
+fn guest_methods<P>(pkg: &Package, out_dir: P, features: &Vec<String>) -> Vec<Risc0Method>
 where
     P: AsRef<Path>,
 {
@@ -191,6 +228,12 @@ where
     pkg.targets
         .iter()
         .filter(|target| target.kind.iter().any(|kind| kind == "bin"))
+        .filter(|target| {
+            target
+                .required_features
+                .iter()
+                .all(|rf| features.contains(rf))
+        })
         .map(|target| Risc0Method {
             name: target.name.clone(),
             elf_path: target_dir

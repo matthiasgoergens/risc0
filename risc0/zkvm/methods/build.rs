@@ -24,6 +24,13 @@ fn main() {
         return;
     }
 
+    let mut inner_pkg_options = GuestOptions {
+        features: vec!["test_feature1".to_string(), "test_feature2".to_string()],
+        std: true,
+    };
+    #[cfg(feature = "risc_cc")]
+    inner_pkg_options.features.push("risc_cc".to_string());
+
     let map = HashMap::from([
         (
             "risc0-zkvm-methods-guest",
@@ -32,13 +39,7 @@ fn main() {
                 std: false,
             },
         ),
-        (
-            "risc0-zkvm-methods-std",
-            GuestOptions {
-                features: vec!["test_feature1".to_string(), "test_feature2".to_string()],
-                std: true,
-            },
-        ),
+        ("risc0-zkvm-methods-std", inner_pkg_options,
     ]);
 
     embed_methods_with_options(map);

@@ -6,6 +6,7 @@ edition = { workspace = true }
 license = { workspace = true }
 homepage = { workspace = true }
 repository = { workspace = true }
+build = "build.rs"
 
 [[bench]]
 name = "fib"
@@ -30,6 +31,7 @@ risc0-zkp = { workspace = true }
 risc0-zkvm-platform = { workspace = true }
 serde = { version = "1.0", default-features = false, features = ["alloc", "derive"] }
 tracing = { version = "0.1", default-features = false, features = ["attributes"] }
+cc = { version = "1", optional = true }
 
 # TODO(nils): Change these `target_os` checks to `target_vendor` checks when we
 # have a real target triple.
@@ -54,6 +56,7 @@ criterion = "0.4"
 tempfile = "3.3"
 tracing-forest = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+serial_test = "0.8.0"
 
 [target.'cfg(not(target_os = "zkvm"))'.dev-dependencies]
 env_logger = "0.10"
@@ -84,3 +87,5 @@ prove = [
     "std",
 ]
 std = ["anyhow/std", "risc0-circuit-rv32im/std", "risc0-zeroio/std", "risc0-zkp/std", "serde/std"]
+# TODO(Matthias): not sure the path works?
+risc_cc = ["cc", "risc0-zkvm-methods/risc_cc"]

@@ -33,3 +33,11 @@ release = false
 [features]
 test_feature1 = []
 test_feature2 = []
+
+[[bin]]
+name = "cc_default"
+required-features = ["risc_cc"]
+
+[[bin]]
+name = "cc_release"
+required-features = ["risc_cc"]
